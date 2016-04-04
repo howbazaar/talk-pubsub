@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Collaboration with git and github.com – Code Craft Tutorial</title>
+
+		<meta name="description" content="Walking through getting get and the branch based workflow for collaboration.">
+		<meta name="author" content="Tim Penhey">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Code Craft Tutorial</h1>
+					<h3>Collaboration with git and github.com</h3>
+					<p>
+						<small><a href="http://github.com/howbazaar">Tim Penhey</a> / <a href="http://twitter.com/howbazaar">@howbazaar</a></small>
+					</p>
+				</section>
+
+				<section>
+					<h2>Code Craft</h2>
+					<p>We meet here the first Tuesday of the month.</p>
+					<p>Meetings are organised on <a href="http://www.meetup.com/Code-Craft-Dunedin/">meetup.com</a>.</p>
+					<p>The mailing list is hosted on <a href="http://groups.google.com/group/codecraft-dunedin">google groups</a>.</p>
+					<p>This is the first of what we hope will be regular
+					tutorials.</p>
+				</section>
+
+				<section>
+					<section>
+						<h2>Meta</h2>
+						<p>This presentation uses <a href="http://lab.hakim.se/reveal-js">reveal.js</a>.</p>
+						<p>Also on github <a href="https://github.com/howbazaar/git-tutorial">howbazaar/git-tutorial</a>.</p>
+					</section>
+					<section>
+						<h2>Follow along on your machine</h2>
+						<code style="font-size: 75%">
+						git&nbsp;clone&nbsp;https://github.com/howbazaar/git-tutorial.git
+						</code>
+						<p>Open a web browser and point at index.html.</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>The Plan</h2>
+						<ul>
+							<li>Get git installed on your laptops</li>
+							<li>Register with github.com</li>
+							<li>Get a local copy of the remote project.</li>
+							<li>Go through the workflow of making a change and getting that change merged into the original project.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Extras</h2>
+						<p>A bunch of people here know about git and github and are here to help.</p>
+					</section>
+				</section>
+
+
+				<!-- Example of nested vertical slides -->
+				<section>
+					<section>
+						<h2>git</h2>
+						<p>Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.</p>
+						<p>Primary <a href="https://git-scm.com/">git website</a>.</p>
+					</section>
+					<section>
+					    <img src="final.doc.gif">
+					</section>
+					<section>
+						<h2>Getting Git</h2>
+						<p>From the git home page, click on the <a href="https://git-scm.com/downloads">Downloads</a> link.</p>
+						<p>Grab the version that is appropriate for your OS.</p>
+					</section>
+					<section>
+						<h2>Don't know git at all?</h2>
+						<p>Spend 15 minutes going through this very
+						good tutorial from github called <a href="http://try.github.com/">Try Git</a>.</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>github.com</h2>
+						<p>Even though git is a distributed revision control system, and everyone has everything, there still needs to be an agreed on master branch.</p>
+						<p>Github is the most popular public host for git repositories.</p>
+					</section>
+					<section>
+						<h2>Logging in</h2>
+						<p>Head over it <a href="http://github.com/">github.com</a> and sign up.</p>
+					</section>
+					<section>
+						<h2>Adding your SSH keys</h2>
+						<p>Add some images here on the fly...</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Something to work on</h2>
+						<p>I wanted us to have something more than just a "hello world" project to work on. So I decided to use <a href="http://lingo.reviews">Lingo</a>.</p>
+						<p>So we can play without annoying Jesse too much, I forked a copy for Code Craft.</p>
+						<p><a href="https://github.com/codecraft-dunedin/lingo">github.com/codecraft-dunedin/lingo</a></p>
+					</section>
+					<section>
+					    <img src="github-lingo.png">
+					</section>
+					<section>
+						<h2>Grabbing your code</h2>
+						<ul>
+							<li>Get some directory where you are going to keep your source files</li>
+							<li>git clone git@github.com:<em>&lt;you&gt;</em>/lingo</li>
+							<li>This makes your copy the <strong>origin</strong></li>
+							<li>Only one branch: <strong>master</strong></li>
+						</ul>
+					</section>
+					<section>
+						<h2>Making a branch for your changes</h2>
+						<ul>
+							<li>Generally you don't want to make changes on your copy of master. You want that to reflect the agreed on <em>true master</em>.</li>
+							<li>git checkout -b hacking</li>
+							<li>This makes a branch off the current one (master), and changes to it.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Make some changes.</h2>
+						<ul>
+							<li>Edit some files.</li>
+							<li>Commit the changes.</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Proposing your changes</h2>
+						<ul>
+							<li>Pushing changes to github</li>
+							<li>Creating a pull request</li>				
+							<li>Having the code review / conversation</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Pushing changes</h2>
+						<ul>
+							<li>git push origin HEAD</li>
+							<li>This means, push the head of the current branch
+							to the origin remote into a branch of the same name.</li>
+							<li>Yes there are other ways, but lets start here</li>
+						</ul>
+					</section>
+					<section>
+						<h2>New pull request</h2>
+						<ul>
+							<li>Check the base branch</li>
+							<li>If this is just playing around, choose <em>codecraft-dunedin/lingo</em></li>
+							<li>If this is a real change for Jesse's project, choose <em>lingo-reviews/lingo</em></li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Grabbing the updated copy</h2>
+						<ul>
+							<li>Add a remote for the 'master'</li>
+							<li>git remote add upstream git@github.com/codecraft-dunedin/lingo.git</li>				
+						</ul>
+					</section>
+					<section>
+						<h2>pulling master</h2>
+						<ul>
+							<li>git checkout master</li>
+							<li>git pull upstream master</li>
+							<li>git branch -d hacking</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<h2>That's it</h2>
+					<p>What shall we do next time?</p>
+				</section>
+
+
+<!--
+				<section data-markdown>
+					<script type="text/template">
+						## Markdown support
+
+						Write content using inline or external Markdown.
+						Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
+
+						```
+						<section data-markdown>
+						  ## Markdown support
+
+						  Write content using inline or external Markdown.
+						  Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
+						</section>
+						```
+					</script>
+				</section>
+-->
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
