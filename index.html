@@ -4,10 +4,10 @@
 	<head>
 		<meta charset="utf-8">
 
-		<title>Collaboration with git and github.com – Code Craft Tutorial</title>
+		<title>Remote Working – Code Craft April 2016</title>
 
-		<meta name="description" content="Walking through getting get and the branch based workflow for collaboration.">
 		<meta name="author" content="Tim Penhey">
+		<meta name="description" content="Remote working, what is it all about.">
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -41,8 +41,8 @@
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>Code Craft Tutorial</h1>
-					<h3>Collaboration with git and github.com</h3>
+					<h1>Remote Working</h1>
+					<h3>Working from home</h3>
 					<p>
 						<small><a href="http://github.com/howbazaar">Tim Penhey</a> / <a href="http://twitter.com/howbazaar">@howbazaar</a></small>
 					</p>
@@ -53,167 +53,163 @@
 					<p>We meet here the first Tuesday of the month.</p>
 					<p>Meetings are organised on <a href="http://www.meetup.com/Code-Craft-Dunedin/">meetup.com</a>.</p>
 					<p>The mailing list is hosted on <a href="http://groups.google.com/group/codecraft-dunedin">google groups</a>.</p>
-					<p>This is the first of what we hope will be regular
-					tutorials.</p>
+					<p>Let us know what you want to hear about.</p>
 				</section>
 
 				<section>
-					<section>
-						<h2>Meta</h2>
-						<p>This presentation uses <a href="http://lab.hakim.se/reveal-js">reveal.js</a>.</p>
-						<p>Also on github <a href="https://github.com/howbazaar/git-tutorial">howbazaar/git-tutorial</a>.</p>
-					</section>
-					<section>
-						<h2>Follow along on your machine</h2>
-						<code style="font-size: 75%">
-						git&nbsp;clone&nbsp;https://github.com/howbazaar/git-tutorial.git
-						</code>
-						<p>Open a web browser and point at index.html.</p>
-					</section>
+					<h2>Meta</h2>
+					<p>This presentation uses <a href="http://lab.hakim.se/reveal-js">reveal.js</a>.</p>
+					<p>Also on github <a href="https://github.com/howbazaar/remote-work">howbazaar/remote-work</a>.</p>
+					<p>My new favourite way to write talks.</p>
 				</section>
 
 				<section>
-					<section>
-						<h2>The Plan</h2>
-						<ul>
-							<li>Get git installed on your laptops</li>
-							<li>Register with github.com</li>
-							<li>Get a local copy of the remote project.</li>
-							<li>Go through the workflow of making a change and getting that change merged into the original project.</li>
-						</ul>
-					</section>
-					<section>
-						<h2>Extras</h2>
-						<p>A bunch of people here know about git and github and are here to help.</p>
-					</section>
-				</section>
-
-
-				<!-- Example of nested vertical slides -->
-				<section>
-					<section>
-						<h2>git</h2>
-						<p>Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.</p>
-						<p>Primary <a href="https://git-scm.com/">git website</a>.</p>
-					</section>
-					<section>
-					    <img src="final.doc.gif">
-					</section>
-					<section>
-						<h2>Getting Git</h2>
-						<p>From the git home page, click on the <a href="https://git-scm.com/downloads">Downloads</a> link.</p>
-						<p>Grab the version that is appropriate for your OS.</p>
-					</section>
-					<section>
-						<h2>Don't know git at all?</h2>
-						<p>Spend 15 minutes going through this very
-						good tutorial from github called <a href="http://try.github.com/">Try Git</a>.</p>
-					</section>
+					<h2>About Tim</h2>
+					<ul style="line-height: 2em">
+						<li>Work for Canonical remotely</li>
+						<li>Head office is in London, UK</li>
+						<li>About 70% of the employees work from home</li>
+						<li>Been doing this for over 9 years now</li>
+					</ul>
 				</section>
 
 				<section>
-					<section>
-						<h2>github.com</h2>
-						<p>Even though git is a distributed revision control system, and everyone has everything, there still needs to be an agreed on master branch.</p>
-						<p>Github is the most popular public host for git repositories.</p>
-					</section>
-					<section>
-						<h2>Logging in</h2>
-						<p>Head over it <a href="http://github.com/">github.com</a> and sign up.</p>
-					</section>
-					<section>
-						<h2>Adding your SSH keys</h2>
-						<p>Add some images here on the fly...</p>
-					</section>
+					<h2>About Tim</h2>
+					<ul style="line-height: 2em">
+						<li>Team Lead on Juju, open source Go project</li>
+						<li>Now have eight direct reports</li>
+						<li>NZ, Australia, UK, and Bulgaria</li>
+						<li>Manager is in the USA</li>
+					</ul>
 				</section>
 
 				<section>
-					<section>
-						<h2>Something to work on</h2>
-						<p>I wanted us to have something more than just a "hello world" project to work on. So I decided to use <a href="http://lingo.reviews">Lingo</a>.</p>
-						<p>So we can play without annoying Jesse too much, I forked a copy for Code Craft.</p>
-						<p><a href="https://github.com/codecraft-dunedin/lingo">github.com/codecraft-dunedin/lingo</a></p>
-					</section>
-					<section>
-					    <img src="github-lingo.png">
-					</section>
-					<section>
-						<h2>Grabbing your code</h2>
-						<ul>
-							<li>Get some directory where you are going to keep your source files</li>
-							<li>git clone git@github.com:<em>&lt;you&gt;</em>/lingo</li>
-							<li>This makes your copy the <strong>origin</strong></li>
-							<li>Only one branch: <strong>master</strong></li>
-						</ul>
-					</section>
-					<section>
-						<h2>Making a branch for your changes</h2>
-						<ul>
-							<li>Generally you don't want to make changes on your copy of master. You want that to reflect the agreed on <em>true master</em>.</li>
-							<li>git checkout -b hacking</li>
-							<li>This makes a branch off the current one (master), and changes to it.</li>
-						</ul>
-					</section>
-					<section>
-						<h2>Make some changes.</h2>
-						<ul>
-							<li>Edit some files.</li>
-							<li>Commit the changes.</li>
-						</ul>
-					</section>
+					<img src="work-from-home.jpg" style="width: 70%">
 				</section>
 
 				<section>
-					<section>
-						<h2>Proposing your changes</h2>
-						<ul>
-							<li>Pushing changes to github</li>
-							<li>Creating a pull request</li>				
-							<li>Having the code review / conversation</li>
-						</ul>
-					</section>
-					<section>
-						<h2>Pushing changes</h2>
-						<ul>
-							<li>git push origin HEAD</li>
-							<li>This means, push the head of the current branch
-							to the origin remote into a branch of the same name.</li>
-							<li>Yes there are other ways, but lets start here</li>
-						</ul>
-					</section>
-					<section>
-						<h2>New pull request</h2>
-						<ul>
-							<li>Check the base branch</li>
-							<li>If this is just playing around, choose <em>codecraft-dunedin/lingo</em></li>
-							<li>If this is a real change for Jesse's project, choose <em>lingo-reviews/lingo</em></li>
-						</ul>
-					</section>
+					<img src="naked-lounge.jpg" style="width: 70%">
 				</section>
 
 				<section>
-					<section>
-						<h2>Grabbing the updated copy</h2>
-						<ul>
-							<li>Add a remote for the 'master'</li>
-							<li>git remote add upstream git@github.com/codecraft-dunedin/lingo.git</li>				
-						</ul>
-					</section>
-					<section>
-						<h2>pulling master</h2>
-						<ul>
-							<li>git checkout master</li>
-							<li>git pull upstream master</li>
-							<li>git branch -d hacking</li>
-						</ul>
-					</section>
+					<h2>Reality</h2>
+					<ul style="line-height: 2em">
+						<li>Need "office" space</li>
+						<li>This is where you work most of the time</li>
+						<li>Flexi-time, 1.5 hour lunches for gym</li>
+						<li>Results driven not hours driven</li>
+					</ul>
 				</section>
 
-				<section>
-					<h2>That's it</h2>
-					<p>What shall we do next time?</p>
-				</section>
+			<section>
+				<h2>My office</h2>
+			</section>
 
+			<section>
+				<h2>Working Hours</h2>
+				<ul style="line-height: 2em">
+					<li>Each person is expected to have predictable hours</li>
+					<li>Most people work 8 - 5, 9 - 6 or some variation</li>
+					<li>Very easy to overwork</li>
+					<li>Time in an office isn't all productive</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Communication</h2>
+				<ul style="line-height: 2em">
+					<li>IRC - old school, freenode and company private</li>
+					<li>Hangouts - 1:1 calls, and team calls</li>
+					<li>Twitter, Facebook, Google+</li>
+					<li>Phone conference when talking with customers</li>
+					<li>Oh, yeah, and heaps of e-mail</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Normal Days - 9am team call</h2>
+				<ul style="line-height: 2em">
+					<li>9am NZ time, 7am Sydney</li>
+					<li>Talk through what we are doing</li>
+					<li>Not really a stand-up, more chat</li>
+					<li>Doesn't include Europeans, they are still new to me</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Weekly</h2>
+				<ul style="line-height: 2em">
+					<li>30 minute 1:1 call with each team member</li>
+					<li>1 hour team call</li>
+					<li>1 hour 1:1 call with my manager</li>
+					<li>Several calls with peers</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Six Monthly</h2>
+				<ul style="line-height: 2em">
+					<li>1 week sprint with big boss feature planning</li>
+					<li>1 week sprint with the team</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Working...</h2>
+				<ul style="line-height: 2em">
+					<li>Calls each morning</li>
+					<li>Often other calls through the day</li>
+					<li>Keep on top of email</li>
+					<li>Be responsive on IRC</li>
+					<li>And add features or fix bugs</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Developing Features</h2>
+				<ul style="line-height: 2em">
+					<li>Break it down into codeable chunks</li>
+					<li>Rough estimates, most people are bad at this</li>
+					<li>Develop locally on your laptop</li>
+					<li>Always have tests</li>
+					<li>Code reviews</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Master your tools</h2>
+				<ul style="line-height: 2em">
+					<li>Whichever editor you use, learn it well</li>
+					<li>Know git well enough to get yourself out of trouble</li>
+					<li>Command line tools are worth knowing, find, xargs, grep</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>When you get stuck</h2>
+				<p>Take the dog for a walk</p>
+				<img src="poodle-walk.jpg" style="width: 400px">
+			</section>
+
+			<section>
+				<h2>Worth noting</h2>
+				<p>Kids don't care who you are talking to</p>
+				<img src="interrupting.jpg" style="width: 600px">
+			</section>
+
+			<section>
+				<h2>It isn't for everyone</h2>
+				<ul style="line-height: 2em">
+					<li>Most your friends are virtual</li>
+					<li>Can feel lonely</li>
+					<li>Miss the water cooler chatter</li>
+					<li>Must have social life outside of work</li>
+				</ul>
+			</section>
+
+			<section>
+				<h2>Questions?</h2>
+			</section>
 
 <!--
 				<section data-markdown>
