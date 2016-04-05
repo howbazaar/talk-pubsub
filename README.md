@@ -1,3 +1,3 @@
-# Collaboration with git and github.com
+# Remote Working - April 2016 Code Craft
 
-Should write something useful here.
+Tim's talk about working from home.
