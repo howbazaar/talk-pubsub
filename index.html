@@ -1,274 +1,1059 @@
 <!doctype html>
 <html lang="en">
 
-	<head>
-		<meta charset="utf-8">
+    <head>
+        <meta charset="utf-8">
 
-		<title>Remote Working – Code Craft April 2016</title>
+        <title>Pub/Sub from Scratch in Go – Code Craft August 2016</title>
 
-		<meta name="author" content="Tim Penhey">
-		<meta name="description" content="Remote working, what is it all about.">
+        <meta name="author" content="Tim Penhey">
+        <meta name="description" content="Publish/Subscribe project in Go.">
 
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css" id="theme">
 
-		<!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
 
-		<!--[if lt IE 9]>
-		<script src="lib/js/html5shiv.js"></script>
-		<![endif]-->
-	</head>
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+        <style>
+        .reveal pre {
+            width: 100%;
+            margin: 0;
+        }
+        .reveal section img {
+            padding: 1em;
+            background-color:#ddd;
+        }
+        .reveal p code {
+            color: yellow;
+            font-size: 80%;
+        }
+        </style>
+    </head>
 
-	<body>
+    <body>
 
-		<div class="reveal">
+        <div class="reveal">
 
-			<!-- Any section element inside of this container is displayed as a slide -->
-			<div class="slides">
-				<section>
-					<h1>Remote Working</h1>
-					<h3>Working from home</h3>
-					<p>
-						<small><a href="http://github.com/howbazaar">Tim Penhey</a> / <a href="http://twitter.com/howbazaar">@howbazaar</a></small>
-					</p>
-				</section>
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>Pub/Sub</h1>
+                    <h1>from Scratch</h1>
+                    <h1>in Go</h1>
+                    <p>
+                        <small><a href="http://github.com/howbazaar">Tim Penhey</a> / <a href="http://twitter.com/howbazaar">@howbazaar</a></small>
+                    </p>
+                </section>
 
-				<section>
-					<h2>Code Craft</h2>
-					<p>We meet here the first Tuesday of the month.</p>
-					<p>Meetings are organised on <a href="http://www.meetup.com/Code-Craft-Dunedin/">meetup.com</a>.</p>
-					<p>The mailing list is hosted on <a href="http://groups.google.com/group/codecraft-dunedin">google groups</a>.</p>
-					<p>Let us know what you want to hear about.</p>
-				</section>
+                <section>
+                    <h2>Code Craft</h2>
+                    <p>We meet here the first Tuesday of the month.</p>
+                    <p>Meetings are organised on <a href="http://www.meetup.com/Code-Craft-Dunedin/">meetup.com</a>.</p>
+                    <p>The mailing list is hosted on <a href="http://groups.google.com/group/codecraft-dunedin">google groups</a>.</p>
+                    <p>Let us know what you want to hear about.</p>
+                </section>
 
-				<section>
-					<h2>Meta</h2>
-					<p>This presentation uses <a href="http://lab.hakim.se/reveal-js">reveal.js</a>.</p>
-					<p>Also on github <a href="https://github.com/howbazaar/remote-work">howbazaar/remote-work</a>.</p>
-					<p>My new favourite way to write talks.</p>
-				</section>
+                <section>
+                    <h2>What's Pub/Sub?</h2>
+                    <ul>
+                        <li>Short for Publish and Subscribe.</li>
+                        <li>A method of decoupling the producer of the information (the Publisher) from the consumer (the Subscriber).</li>
+                    </ul>
+                </section>
 
-				<section>
-					<h2>About Tim</h2>
-					<ul style="line-height: 2em">
-						<li>Work for Canonical remotely</li>
-						<li>Head office is in London, UK</li>
-						<li>About 70% of the employees work from home</li>
-						<li>Been doing this for over 9 years now</li>
-					</ul>
-				</section>
+                <section>
+                    <h2>This talk</h2>
+                    <ul>
+                        <li>Getting to a publish and subscribe abstraction.</li>
+                        <li>Walk through the development process of a library.</li>
+                        <li>End up with a quick look at <a href="http://github.com/juju/pubsub">http://github.com/juju/pubsub</a>.</li>
+                    </ul>
+                </section>
 
-				<section>
-					<h2>About Tim</h2>
-					<ul style="line-height: 2em">
-						<li>Team Lead on Juju, open source Go project</li>
-						<li>Now have eight direct reports</li>
-						<li>NZ, Australia, UK, and Bulgaria</li>
-						<li>Manager is in the USA</li>
-					</ul>
-				</section>
+                <section>
+                    <h2>In the beginning...</h2>
+                </section>
 
-				<section>
-					<img src="work-from-home.jpg" style="width: 70%">
-				</section>
+                <section>
+                    <section>
+                        <h2>Tight Coupling</h2>
+                        <p>Traditional method calling.</p>
+                        <img src="producer-consumer.png">
+                    </section>
 
-				<section>
-					<img src="naked-lounge.jpg" style="width: 70%">
-				</section>
+                    <section>
+                        <h2>The Consumer</h2>
+                        <p>We have a consumer that wants structured data.</p>
+                        <pre><code class="go">
+type Consumer struct {
+    // internal fields, doesn't matter here
+}
 
-				<section>
-					<h2>Distributed Teams</h2>
-					<p>Working from home &ne; distributed team.	 </p>
-					<p>You at home vs all distributed.</p>
-					<p>I'm talking about distrubuted teams</p>
-				</section>
+type Data struct {
+    // some useful data types
+}
 
-				<section>
-					<h2>Reality</h2>
-					<ul style="line-height: 2em">
-						<li>Need "office" space</li>
-						<li>This is where you work most of the time</li>
-						<li>Flexi-time, 1.5 hour lunches for gym</li>
-						<li>Results driven not hours driven</li>
-					</ul>
-				</section>
+func (*Consumer) Notify(data Data) {
+    // do stuff with data
+}
+                        </code></pre>
+                    </section>
 
-			<section>
-				<h2>My office</h2>
-				<img src="office.jpg" >
-			</section>
+                    <section>
+                        <h2>The Producer</h2>
+                        <p>The producer, that creates the data, </p>
+                        <p>has a reference to a consumer.</p>
+                        <pre><code class="go">
+type Producer struct {
+    consumer *Consumer
+}
 
-			<section>
-				<h2>Working Hours</h2>
-				<ul style="line-height: 2em">
-					<li>Each person is expected to have predictable hours</li>
-					<li>Most people work 8 - 5, 9 - 6 or some variation</li>
-					<li>Very easy to overwork</li>
-					<li>Time in an office isn't all productive</li>
-				</ul>
-			</section>
+func NewProducer(consumer *Consumer) *Producer {
+    return &amp;Producer{consumer}
+}
+                        </code></pre>
+                    </section>
+    
+                    <section>
+                        <h2>Method Calling</h2>
+                        <p>The producer calls the method directly on the consumer.</p>
+                        <pre><code class="go">
+func (p *Producer) Call() {
+    data := Data{...}
+    // do stuff
+    p.consumer.Notify(data)
+}
+                        </code></pre>
+                    </section>
+                </section>
 
-			<section>
-				<h2>Communication</h2>
-				<ul style="line-height: 2em">
-					<li>IRC - old school, freenode and company private</li>
-					<li>Hangouts - 1:1 calls, and team calls</li>
-					<li>Twitter, Facebook, Google+</li>
-					<li>Phone conference when talking with customers</li>
-					<li>Oh, yeah, and heaps of e-mail</li>
-				</ul>
-			</section>
+                <section>
+                    <section>
+                        <h2>Reducing Coupling</h2>
+                        <p>Step one is to use an interface.</p>
+                    </section>
 
-			<section>
-				<h2>Normal Days - 9am team call</h2>
-				<ul style="line-height: 2em">
-					<li>9am NZ time, 7am Sydney</li>
-					<li>Talk through what we are doing</li>
-					<li>Not really a stand-up, more chat</li>
-					<li>Doesn't include Europeans, they are still new to me</li>
-				</ul>
-			</section>
+                    <section>
+                        <h2>The Consumer interface</h2>
+                        <p>Instead of taking a concerte type, the Consumer interface is declared with the Producer.</p>
+                        <pre><code class="go">
+type Consumer interface {
+    Notify(data Data)
+}
 
-			<section>
-				<h2>Weekly</h2>
-				<ul style="line-height: 2em">
-					<li>30 minute 1:1 call with each team member</li>
-					<li>1 hour team call</li>
-					<li>1 hour 1:1 call with my manager</li>
-					<li>Several calls with peers</li>
-				</ul>
-			</section>
+type Producer struct {
+    consumer Consumer
+}
 
-			<section>
-				<h2>Six Monthly</h2>
-				<ul style="line-height: 2em">
-					<li>1 week sprint with big boss feature planning</li>
-					<li>1 week sprint with the team</li>
-				</ul>
-			</section>
+func NewProducer(consumer Consumer) *Producer {
+    return &amp;Producer{consumer}
+}
+                        </code></pre>
+                    </section>
 
-			<section>
-				<h2>Working...</h2>
-				<ul style="line-height: 2em">
-					<li>Calls each morning</li>
-					<li>Often other calls through the day</li>
-					<li>Keep on top of email</li>
-					<li>Be responsive on IRC</li>
-					<li>And add features or fix bugs</li>
-				</ul>
-			</section>
+                    <section>
+                        <h2>Defining Consumers</h2>
+                        <p>Any structure that implements the methods defined by the Consumer interface can now be passed to the NewProducer function.</p>
+                        <pre><code class="go">
+type MyConsumer struct {
+    // internal fields, doesn't matter here
+}
 
-			<section>
-				<h2>Developing Features</h2>
-				<ul style="line-height: 2em">
-					<li>Break it down into codeable chunks</li>
-					<li>Rough estimates, most people are bad at this</li>
-					<li>Develop locally on your laptop</li>
-					<li>Always have tests</li>
-					<li>Code reviews</li>
-				</ul>
-			</section>
+// Notify implements the Consumer insterface.
+func (*MyConsumer) Notify(data Data) {
+    // do stuff with data
+}
 
-			<section>
-				<h2>Master your tools</h2>
-				<ul style="line-height: 2em">
-					<li>Whichever editor you use, learn it well</li>
-					<li>Know git well enough to get yourself out of trouble</li>
-					<li>Command line tools are worth knowing, find, xargs, grep</li>
-				</ul>
-			</section>
+    // in some function...
+    consumer := &amp;MyConsumer{...}
+    producer := NewProducer(consumer)
 
-			<section>
-				<h2>When you get stuck</h2>
-				<p>Take the dog for a walk</p>
-				<img src="poodle-walk.jpg" style="width: 400px">
-			</section>
+                        </code></pre>
+                    </section>
+    
+                    <section>
+                        <h2>Method Calling</h2>
+                        <p>The producer still calls the method directly on the consumer.</p>
+                        <pre><code class="go">
+func (p *Producer) Call() {
+    data := Data{...}
+    // do stuff
+    p.consumer.Notify(data)
+}
+                        </code></pre>
+                    </section>
+            </section>
 
-			<section>
-				<h2>Worth noting</h2>
-				<p>Kids don't care who you are talking to</p>
-				<img src="interrupting.jpg" style="width: 600px">
-			</section>
 
-			<section>
-				<h2>It isn't for everyone</h2>
-				<ul style="line-height: 2em">
-					<li>Most your friends are virtual</li>
-					<li>Can feel lonely</li>
-					<li>Miss the water cooler chatter</li>
-					<li>Must have social life outside of work</li>
-				</ul>
-			</section>
 
-			<section>
-				<h2>Questions?</h2>
-			</section>
+            <section>
+                <h2>What if there is more than one consumer?</h2>
+                <img src="producer-consumers.png" >
+            </section>
+
+
+            <section>
+                <section>
+                    <h2>Enter the Observer Pattern</h2>
+                    <img src="observer.png" >
+                </section>
+
+                <section>
+                    <h2>Multiple Consumers</h2>
+                    <p>Now the Producer has a slice of consumers.</p>
+                    <pre><code class="go">
+type Producer struct {
+    // consumers is now a slice
+    consumers []Consumer
+}
+
+func (p *Producer) AddConsumer(consumer Consumer) {
+    p.consumers = append(p.consumers, consumer)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Notifying Consumers</h2>
+                    <p>Iterating over the consumers calling each one.</p>
+                    <pre><code class="go">
+func (p *Producer) Call() {
+    data := Data{...}
+    // do stuff
+    for _, consumer := range p.consumers {
+        consumer.Notify(data)
+    }
+}
+                    </code></pre>
+                </section>
+    
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>Decoupling the Producer and Consumer</h2>
+                    <img src="hub.png" >
+                </section>
+
+                <section>
+                    <h2>The Hub stores the consumers</h2>
+                    <pre><code class="go">
+type Hub struct {
+    // consumers is now a slice
+    consumers []Consumer
+}
+
+func (p *Hub) AddConsumer(consumer Consumer) {
+    p.consumers = append(p.consumers, consumer)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Notifying Consumers</h2>
+                    <pre><code class="go">
+func (p *Hub) Notify(data Data) {
+    data := Data{...}
+    // do stuff
+    for _, consumer := range p.consumers {
+        consumer.Notify(data)
+    }
+}
+                    </code></pre>
+                </section>
+
+
+                <section>
+                    <h2>The Producer becomes smiple again</h2>
+                    <pre><code class="go">
+type Producer struct {
+    consumer Consumer
+}
+
+func NewProducer(consumer Consumer) *Producer {
+    return &amp;Producer{consumer}
+}
+
+func (p *Producer) Call() {
+    data := Data{...}
+    // do stuff
+    p.consumer.Notify(data)
+}
+                    </code></pre>
+                </section>
+
+            </section>
+
+            <section>
+                <h2>Quick Glossary</h2>
+                <ul>
+                    <li class="fragment">Publisher - the entity that generates the event</li>
+                    <li class="fragment">Publishing - the act notifying the subscribers</li>
+                    <li class="fragment">Subscriber - an entity wanting to be notified of an event</li>
+                    <li class="fragment">Callback - a function passed by the subscriber to be called for the event</li>
+                </ul>
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>Making the Hub more generic</h2>
+                    <ul>
+                        <li class="fragment">Handle multiple event types</li>
+                        <li class="fragment">Publish arbitrary message data</li>
+                        <li class="fragment">Notify subscribers asynchronously</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Multiple event types</h2>
+                    <p>Use a name for an event, let's call them <em>topics</em>.</p>
+                    <pre><code class="go">
+type Topic string
+
+func (h *Hub) Publish(topic Topic, ...) {
+    // implementation
+}
+
+func (h *Hub) Subscribe(topic Topic, ...) {
+    // implementation
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Arbitrary message data</h2>
+                    <p>The <code>interface{}</code> type can be anything.</p>
+                    <pre><code class="go">
+func (h *Hub) Publish(topic Topic, data interface{}) {
+    // implementation
+}
+
+func (h *Hub) Subscribe(topic Topic, func (Topic, interface{})) {
+    // implementation
+}
+                    </code></pre>
+                </section>
+
+
+                <section>
+                    <h2>The subscriber</h2>
+                    <pre><code class="go" data-trim>
+type subscriber struct {
+    topic    Topic
+    callback func(Topic, interface{})
+}
+
+type Hub struct {
+    mutex       sync.Mutex
+    subscribers []*subscriber
+}
+
+func (h *Hub) Subscribe(topic Topic, callback func (Topic, interface{})) {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+    h.subscribers = append(h.subscribers, &amp;subscriber{topic, callback})
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Async callback</h2>
+                    <pre><code class="go" data-trim>
+func (h *Hub) Publish(topic Topic, data interface{}) {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+    for _, subscriber := range h.subscribers {
+        if subscriber.topic == topic {
+            go subscriber.callback(topic, data)
+        }
+    }
+}
+                    </code></pre>
+                </section>
+
+            </section>
+
+            <section>
+                <h2>Hub Guarantees</h2>
+                <ul>
+                    <li class="fragment">Publish and Subscribe are goroutine safe</li>
+                    <li class="fragment">Slow subscribers won't block Publish</li>
+                    <li class="fragment">Slow subscribers won't interfere with other subscribers</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Issues</h2>
+                <ul>
+                    <li class="fragment">How do you unsubscribe?</li>
+                    <li class="fragment">How do you test?</li>
+                    <li class="fragment">What about callback ordering?</li>
+                </ul>
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>Unsubscribing</h2>
+                    <p>Have the <code>Subscribe</code> function return something that can be used to unsubscribe.</p>
+                    <pre><code class="go">
+type Unsubscriber interface {
+    Unsubscribe()
+}
+
+func (h *Hub) Subscribe(...) Unsubscriber {
+    // implementation
+}
+</code></pre>
+
+                </section>
+
+                <section>
+                    <h2>Identifying the subscription</h2>
+                    <p>Each subscription has a unique identifier.</p>
+                    <pre><code class="go" data-noescape>
+type subscriber struct {
+    <mark>id       int</mark>
+    topic    Topic
+    callback func(Topic, interface{})
+}
+
+type Hub struct {
+    mutex       sync.Mutex
+    <mark>index       int</mark>
+    subscribers []*subscriber
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>The private unsubscribe method</h2>
+                    <pre><code class="go" data-trim>
+func (h *Hub) unsubscribe(id int) {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+
+    for i, sub := range h.subscribers {
+        if sub.id == id {
+            h.subscribers = append(
+                h.subscribers[0:i],
+                h.subscribers[i+1:]...)
+            return
+        }
+    }
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>The unsubscriber</h2>
+                    <pre><code class="go" data-trim>
+type handle struct {
+    hub *Hub
+    id  int
+}
+
+// Unsubscribe implements Unsubscriber.
+func (h *handle) Unsubscribe() {
+    h.hub.unsubscribe(h.id)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Identifying the subscription</h2>
+                    <p>Each subscription has a unique identifier.</p>
+                    <pre><code class="go" data-noescape data-trim>
+func (h *Hub) Subscribe(topic Topic,
+                 callback func (Topic, interface{})) Unsubscriber {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+    h.index++
+    h.subscribers = append(h.subscribers, &amp;subscriber{
+        id: h.index, topic: topic, callback: callback})
+    return &amp;handle{hub: h, id: h.index}
+}                    
+                    </code></pre>
+                </section>
+
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>Testing</h2>
+                    <pre><code class="go" data-trim>
+func (*Suite) TestPublishOneSubscriber(c *gc.C) {
+    var called bool
+    hub := pubsub.NewHub()
+    hub.Subscribe(topic, func(topic pubsub.Topic, data interface{}) {
+        c.Check(topic, gc.Equals, topic)
+        c.Check(data, gc.IsNil)
+        called = true
+    })
+    hub.Publish(topic, nil)
+    // How long do we wait, how do we know it was called?
+    c.Assert(called, jc.IsTrue)
+}
+</code></pre>
+
+                </section>
+
+
+                <section>
+                    <h2>Knowing we're done</h2>
+                    <p>Go channels are used for signalling.</p>
+                    <pre><code class="go" data-trim>
+func waitForMessageHandlingToBeComplete(c *gc.C, done <-chan struct{}) {
+    select {
+    case <-done:
+    case <-time.After(time.Second):
+        // We expect message handling to be done in under 1ms
+        // so waiting for a second is 1000x as long.
+        c.Fatal("publish did not complete")
+    }
+}
+</code></pre>
+
+                </section>
+
+
+                <section>
+                    <h2>Publish returns a channel</h2>
+                    <pre><code class="go" data-trim>
+
+func (h *Hub) Publish(topic Topic, data interface{}) <-chan struct{} {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+
+    done := make(chan struct{})
+    wait := sync.WaitGroup{}
+
+    for _, subscriber := range h.subscribers {
+        if subscriber.topic == topic {
+            wait.Add(1)
+            go func(){
+                defer wait.Done()
+                subscriber.callback(topic, data)
+            }
+        }
+    }
+
+    go func() {
+        wait.Wait()
+        close(done)
+    }()
+
+    return done
+}
+
+</code></pre>
+
+                </section>
+
+                <section>
+                    <h2>Testing</h2>
+                    <pre><code class="go" data-trim>
+func (*Suite) TestPublishOneSubscriber(c *gc.C) {
+    var called bool
+    var topic pubsub.Topic = "test topic"
+    hub := pubsub.NewHub()
+    hub.Subscribe(topic, func(call pubsub.Topic, data interface{}) {
+        c.Check(call, gc.Equals, topic)
+        c.Check(data, gc.IsNil)
+        called = true
+    })
+
+    done := hub.Publish(topic, nil)
+    waitForMessageHandlingToBeComplete(c, done)
+
+    c.Assert(called, jc.IsTrue)
+}
+</code></pre>
+
+                </section>
+
+            </section>
+
+
+            <section>
+
+                <section>
+                    <h2>Ordering</h2>
+                    <p>If multiple calls to <code>Publish</code> are made that match a subscriber, what order does the subscriber get told about the events?</p>
+                    <p class="fragment fade-up" style="color: red">It depends</p>
+                </section>
+
+                <section> 
+                    <h2>Desired Guarantees</h2>
+                    <ul>
+                        <li>Publish and Subscribe are goroutine safe</li>
+                        <li>Slow subscribers won't block Publish</li>
+                        <li>Slow subscribers won't interfere with other subscribers</li>
+                        <li class="fragment highlight-green">Subscriber's callback is called in the order that Publish was called</li>
+                    </ul>
+                </section>
+
+                <section> 
+                    <h2>Smarter Subscribers</h2>
+                    <ul>
+                        <li class="fragment">Each subscriber has its own goroutine</li>
+                        <li class="fragment">Each subscriber has its own queue of callbacks</li>
+                        <li class="fragment">Unsubscribing stops all pending callbacks</li>
+                        <li class="fragment">Cleared callbacks also decrement the wait group</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>The subscriber type</h2>
+                    <pre><code class="go" data-trim>
+type subscriber struct {
+    id int
+
+    topic   Topic
+    handler func(topic Topic, data interface{})
+
+    mutex   sync.Mutex
+    pending *deque.Deque
+    closed  chan struct{}
+    data    chan struct{}
+    done    chan struct{}
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Creating the subscriber starts a goroutine</h2>
+                    <pre><code class="go" data-trim>
+func newSubscriber(topic Topic, handler func(Topic, interface{}))
+         *subscriber {
+    // A closed channel is used to provide an immediate 
+    // route through a select call in the loop function.
+    closed := make(chan struct{})
+    close(closed)
+    sub := &amp;subscriber{
+        topic:    topic,
+        handler:  handler,
+        pending:  deque.New(),
+        data:     make(chan struct{}, 1),
+        done:     make(chan struct{}),
+        closed:   closed,
+    }
+    go sub.loop()
+    return sub
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Encapsulating the event</h2>
+                    <pre><code class="go" data-trim>
+type handlerCallback struct {
+    topic Topic
+    data  interface{}
+    wg    *sync.WaitGroup
+}
+
+func (h *handlerCallback) done() {
+    h.wg.Done()
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Notifying the Subscriber</h2>
+                    <pre><code class="go" data-trim>
+func (s *subscriber) notify(call *handlerCallback) {
+    s.mutex.Lock()
+    defer s.mutex.Unlock()
+
+    s.pending.PushBack(call)
+
+    if s.pending.Len() == 1 {
+        s.data <- struct{}{}
+    }
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Popping off the deque</h2>
+                    <pre><code class="go" data-trim>
+func (s *subscriber) popOne() (*handlerCallback, bool) {
+    s.mutex.Lock()
+    defer s.mutex.Unlock()
+
+    val, ok := s.pending.PopFront()
+    if !ok {
+        // nothing to do
+        return nil, true
+    }
+
+    empty := s.pending.Len() == 0
+    return val.(*handlerCallback), empty
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Subscriber loop goroutine</h2>
+                    <pre><code class="go" data-trim>
+func (s *subscriber) loop() {
+    var next <-chan struct{}
+    for {
+        select {
+        case <-s.done:
+            return
+        case <-s.data:
+            // Has new data been pushed on?
+        case <-next:
+            // If there was already data, next is a closed channel.
+            // otherwise it is nil so won't pass through.
+        }
+        call, empty := s.popOne()
+        if empty {
+            next = nil
+        } else {
+            next = s.closed
+        }
+        // call *should* never be nil as we should only be calling
+        // popOne in the situations where there is actually 
+        // something to pop.
+        if call != nil {
+            s.handler(call.topic, call.data)
+            call.done()
+        }
+    }
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Stopping the goroutine</h2>
+                    <pre><code class="go" data-trim>
+func (s *subscriber) close() {
+    s.mutex.Lock()
+    defer s.mutex.Unlock()
+    // Need to iterate through all the pending calls and make
+    // sure the wait group is decremented.
+    for call, ok := s.pending.PopFront(); ok;
+        call, ok = s.pending.PopFront() {
+        call.(*handlerCallback).done()
+    }
+    close(s.done)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Unsubscribing closes the subscriber</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+func (h *Hub) unsubscribe(id int) {
+    h.mutex.Lock()
+    defer h.mutex.Unlock()
+
+    for i, sub := range h.subscribers {
+        if sub.id == id {
+            <mark>sub.close()</mark>
+            h.subscribers = append(
+                h.subscribers[0:i],
+                h.subscribers[i+1:]...)
+            return
+        }
+    }
+}
+                    </code></pre>
+                </section>
+
+            </section>
+
+            <section>
+                <h2>There we have it</h2>
+                <p class="fragment">The SimpleHub</p>
+                <p class="fragment">Now what?</p>
+                <p class="fragment">How about not having callbacks with <code>interface{}</code>?</p>
+                <p class="fragment">Better topic matching</code>?</p>
+            </section>
+
+            <section>
+
+                <section>
+                    <h2>The structured Hub</h2>
+                    <p>Hander functions for a structured hub can get all the published data available
+                    by defining a callback with the signature:</p>
+                    <pre><code class="go" data-trim  data-noescape>
+       func (Topic, map[string]interface{})
+                    </code></pre>
+                    <p>Or alternatively, define a struct type, and use that type as the second argument.</p>
+                    <pre><code class="go" data-trim  data-noescape>
+       func (Topic, SomeStruct, error)
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Structured Hub Publish</h2>
+                    <p>Uses the simple hub, and wraps all callbacks so the <code>data interface{}</code>
+                    used for the simple hub publish method is always given a <code>map[string]interface{}</code></p>
+                    <p>Converting the <code>data</code> value can now generate an error.</p>
+                    <pre><code class="go" data-trim  data-noescape>
+func (h *StructuredHub) Publish(topic Topic, data interface{})
+    (<-chan struct{}, error) {
+    // convert data to map[string]interface{}
+
+    // call the simple hub Publish with the map
+}
+                    </code></pre>
+                </section>
+
+
+                <section>
+                    <h2>Marshallers</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+// Marshaller defines the Marshal and Unmarshal methods used to 
+// serialize and deserialize the structures used in Publish and 
+// Subscription handlers of the structured hub.
+type Marshaller interface {
+    // Marshal converts the argument into a byte streem that it
+    // can then Unmarshal.
+    Marshal(interface{}) ([]byte, error)
+
+    // Unmarshal attempts to convert the byte stream into type 
+    // passed in as the second arg.
+    Unmarshal([]byte, interface{}) error
+}
+                    </code></pre>
+
+                </section>
+
+                <section>
+                    <h2>JSON Marshaller</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+import "encoding/json"
+
+// JSONMarshaller simply wraps the json.Marshal and json.Unmarshal
+// calls for the Marshaller interface.
+var JSONMarshaller = &amp;jsonMarshaller{}
+
+type jsonMarshaller struct{}
+
+func (*jsonMarshaller) Marshal(v interface{}) ([]byte, error) {
+    return json.Marshal(v)
+}
+
+func (*jsonMarshaller) Unmarshal(data []byte, v interface{}) error {
+    return json.Unmarshal(data, v)
+}
+                    </code></pre>
+
+                </section>
+
+                <section>
+                    <h2>Converting data</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+
+func (h *StructuredHub) toStringMap(data interface{})
+        (map[string]interface{}, error) {
+    var result map[string]interface{}
+    // use the reflect package to get the type of the map
+    resultType := reflect.TypeOf(result)
+    // get the type of the data value
+    dataType := reflect.TypeOf(data)
+    // if you can assign the data value to the result map
+    // it is a map[string]interface{}
+    if dataType.AssignableTo(resultType) {
+        cast, ok := data.(map[string]interface{})
+        if !ok {
+            return nil, errors.Errorf(
+                "%T assignable to map[string]interface{}"+
+                " but isn't one?", data)
+        }
+        return cast, nil
+    }
+    // convert to a map by marshalling the structure
+    // out and back into a map
+    bytes, err := h.marshaller.Marshal(data)
+    if err != nil {
+        return nil, errors.Annotate(err, "marshalling")
+    }
+    err = h.marshaller.Unmarshal(bytes, &amp;result)
+    if err != nil {
+        return nil, errors.Annotate(err, "unmarshalling")
+    }
+    return result, nil
+}
+                    </code></pre>
+
+                </section>
+
+                <section>
+                    <h2>Structured Hub Subscribe</h2>
+                    <p>Subscribing can now also generate an error if the handler
+                    function doesn't match the expected signatures.</p>
+                    <pre><code class="go" data-trim  data-noescape>
+func (h *StructuredHub) Subscribe(topic Topic, handler interface{})
+         (Unsubscriber, error) {
+    // reflection to interrogate the handler to make
+    // sure it is a function that matches either
+    //   `func(Topic, map[string]interface{})`
+    // or
+    //   `func(Topic, SomeStruct, error)`
+}
+                    </code></pre>
+                </section>
+
+            </section>
+
+
+            <section>
+
+                <section>
+                    <h2>The topic matcher</h2>
+                    <p>Originally I started with regular expressions.</p>
+                    <pre><code class="go" data-trim  data-noescape>
+// Topic represents a message that can be subscribed to.
+type Topic string
+
+// TopicMatcher defines the Match method that is used to determine
+// if the subscriber should be notified about a particular message.
+type TopicMatcher interface {
+    Match(Topic) bool
+}
+
+// Match implements TopicMatcher. One topic matches another if they
+// are equal.
+func (t Topic) Match(topic Topic) bool {
+    return t == topic
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Match Regular Expressions</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+// RegexpMatcher allows standard regular expressions to be used as
+// TopicMatcher values.
+type RegexpMatcher regexp.Regexp
+
+// MatchRegexp expects a valid regular expression. If the expression
+// passed in is not valid, the function panics. The expected use of this
+// is to be able to do something like:
+//     `hub.Subscribe(pubsub.MatchRegex("prefix.*suffix"), handler)`
+func MatchRegexp(expression string) TopicMatcher {
+    return (*RegexpMatcher)(regexp.MustCompile(expression))
+}
+
+// The topic matches if the regular expression matches the topic.
+func (m *RegexpMatcher) Match(topic Topic) bool {
+    r := (*regexp.Regexp)(m)
+    return r.MatchString(string(topic))
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Match Everything</h2>
+                    <p>During initial use, I found that I wanted to be able to match every topic.</p>
+                    <pre><code class="go" data-trim  data-noescape>
+type allMatcher struct{}
+
+// Match implements TopicMatcher.  All topics match for the allMatcher.
+func (*allMatcher) Match(topic Topic) bool {
+    return true
+}
+
+// MatchAll is a topic matcher that matches all topics.
+var MatchAll TopicMatcher = (*allMatcher)(nil)
+                    </code></pre>
+                </section>
+            </section>
+
+            <section>
+                <h2>All Open source</h2>
+                <ul>
+                    <li class="fragment">Licenced using LGPL v3</li>
+                    <li class="fragment">Code at <a href="http://github.com/juju/pubsub">github.com/juju/pubsub</a></li>
+                    <li class="fragment">All Go docs at <a href="http://godoc.org">godoc.org</a> 
+                        <ul>
+                            <li class="fragment"><a href="http://godoc.org/github.com/juju/pubsub">http://godoc.org/github.com/juju/pubsub</a> </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Questions?</h2>
+            </section>
 
 <!--
-				<section data-markdown>
-					<script type="text/template">
-						## Markdown support
+                <section data-markdown>
+                    <script type="text/template">
+                        ## Markdown support
 
-						Write content using inline or external Markdown.
-						Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
+                        Write content using inline or external Markdown.
+                        Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
 
-						```
-						<section data-markdown>
-						  ## Markdown support
+                        ```
+                        <section data-markdown>
+                          ## Markdown support
 
-						  Write content using inline or external Markdown.
-						  Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
-						</section>
-						```
-					</script>
-				</section>
+                          Write content using inline or external Markdown.
+                          Instructions and more info available in the [readme](https://github.com/hakimel/reveal.js#markdown).
+                        </section>
+                        ```
+                    </script>
+                </section>
 -->
-			</div>
+            </div>
 
-		</div>
+        </div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
 
-		<script>
+        <script>
 
-			// Full list of configuration options available at:
-			// https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				history: true,
-				center: true,
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
 
-				transition: 'slide', // none/fade/slide/convex/concave/zoom
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
 
-				// Optional reveal.js plugins
-				dependencies: [
-					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: 'plugin/zoom-js/zoom.js', async: true },
-					{ src: 'plugin/notes/notes.js', async: true }
-				]
-			});
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
 
-		</script>
+        </script>
 
-	</body>
+    </body>
 </html>
