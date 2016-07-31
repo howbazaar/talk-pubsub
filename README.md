@@ -1,3 +1,3 @@
-# Remote Working - April 2016 Code Craft
+# Pub/Sub from Scratch in Go - August 2016 Code Craft
 
-Tim's talk about working from home.
+Tim's talk about juju/pubsub.
