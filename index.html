@@ -55,6 +55,25 @@
             <!-- Any section element inside of this container is displayed as a slide -->
             <div class="slides">
                 <section>
+                    <h2>Code Craft</h2>
+                    <ul style="line-height: 2em">
+                        <li>We meet here the first Tuesday of the month.</li>
+                        <li>Meetings are organised on meetup.com
+                          <ul>
+                            <li><a href="http://www.meetup.com/Code-Craft-Dunedin/">www.meetup.com/Code-Craft-Dunedin/</a></li>
+                           </ul>
+                        </li>
+                        <li>The mailing list is hosted on google groups
+                          <ul>
+                            <li><a href="http://groups.google.com/group/codecraft-dunedin">groups.google.com/group/codecraft-dunedin</a></li>
+                          </ul>
+                        </li>
+                        <li>Come and talk about something you are interested in.</li>
+                        <li>Let us know what you want to hear about.</li>
+                    </ul>
+                </section>
+
+                <section>
                     <h1>Pub/Sub</h1>
                     <h1>from Scratch</h1>
                     <h1>in Go</h1>
@@ -63,17 +82,10 @@
                     </p>
                 </section>
 
-                <section>
-                    <h2>Code Craft</h2>
-                    <p>We meet here the first Tuesday of the month.</p>
-                    <p>Meetings are organised on <a href="http://www.meetup.com/Code-Craft-Dunedin/">meetup.com</a>.</p>
-                    <p>The mailing list is hosted on <a href="http://groups.google.com/group/codecraft-dunedin">google groups</a>.</p>
-                    <p>Let us know what you want to hear about.</p>
-                </section>
 
                 <section>
                     <h2>What's Pub/Sub?</h2>
-                    <ul>
+                    <ul style="line-height: 2em">
                         <li>Short for Publish and Subscribe.</li>
                         <li>A method of decoupling the producer of the information (the Publisher) from the consumer (the Subscriber).</li>
                     </ul>
@@ -81,7 +93,7 @@
 
                 <section>
                     <h2>This talk</h2>
-                    <ul>
+                    <ul style="line-height: 2em">
                         <li>Getting to a publish and subscribe abstraction.</li>
                         <li>Walk through the development process of a library.</li>
                         <li>End up with a quick look at <a href="http://github.com/juju/pubsub">http://github.com/juju/pubsub</a>.</li>
@@ -102,7 +114,7 @@
                     <section>
                         <h2>The Consumer</h2>
                         <p>We have a consumer that wants structured data.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
 type Consumer struct {
     // internal fields, doesn't matter here
 }
@@ -111,6 +123,8 @@ type Data struct {
     // some useful data types
 }
 
+// This function has a receiver, the (*Consumer) bit, that
+// makes it a method on Consumer.
 func (*Consumer) Notify(data Data) {
     // do stuff with data
 }
@@ -121,12 +135,16 @@ func (*Consumer) Notify(data Data) {
                         <h2>The Producer</h2>
                         <p>The producer, that creates the data, </p>
                         <p>has a reference to a consumer.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
 type Producer struct {
+    // This is a pointer to a Consumer structure.
     consumer *Consumer
 }
 
 func NewProducer(consumer *Consumer) *Producer {
+    // &amp; takes the address of the thing. This is how
+    // Go gets pointers to things. The {...} is a struct
+    // initialiser.
     return &amp;Producer{consumer}
 }
                         </code></pre>
@@ -135,7 +153,11 @@ func NewProducer(consumer *Consumer) *Producer {
                     <section>
                         <h2>Method Calling</h2>
                         <p>The producer calls the method directly on the consumer.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
+// This receiver as a name "p", and is used to access
+// the elements of the Producer struct. It is the "Go"
+// way to generally use a single character for this,
+// and not use words like "this" or "self".
 func (p *Producer) Call() {
     data := Data{...}
     // do stuff
@@ -154,7 +176,8 @@ func (p *Producer) Call() {
                     <section>
                         <h2>The Consumer interface</h2>
                         <p>Instead of taking a concerte type, the Consumer interface is declared with the Producer.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
+// An interface is just a collection of methods.
 type Consumer interface {
     Notify(data Data)
 }
@@ -163,6 +186,8 @@ type Producer struct {
     consumer Consumer
 }
 
+// Any type that implements the Notify method
+// can be passed as the Consumer.
 func NewProducer(consumer Consumer) *Producer {
     return &amp;Producer{consumer}
 }
@@ -172,7 +197,7 @@ func NewProducer(consumer Consumer) *Producer {
                     <section>
                         <h2>Defining Consumers</h2>
                         <p>Any structure that implements the methods defined by the Consumer interface can now be passed to the NewProducer function.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
 type MyConsumer struct {
     // internal fields, doesn't matter here
 }
@@ -192,7 +217,8 @@ func (*MyConsumer) Notify(data Data) {
                     <section>
                         <h2>Method Calling</h2>
                         <p>The producer still calls the method directly on the consumer.</p>
-                        <pre><code class="go">
+                        <pre><code class="go" data-trim>
+// This isn't a trick, it hasn't changed.
 func (p *Producer) Call() {
     data := Data{...}
     // do stuff
@@ -213,13 +239,16 @@ func (p *Producer) Call() {
             <section>
                 <section>
                     <h2>Enter the Observer Pattern</h2>
-                    <img src="observer.png" >
+                    <figure>
+                        <img src="observer.png" >
+                        <figcaption style="font-size: 75%">Source: wikipedia</figcaption>
+                    </figure>
                 </section>
 
                 <section>
                     <h2>Multiple Consumers</h2>
                     <p>Now the Producer has a slice of consumers.</p>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
 type Producer struct {
     // consumers is now a slice
     consumers []Consumer
@@ -234,10 +263,16 @@ func (p *Producer) AddConsumer(consumer Consumer) {
                 <section>
                     <h2>Notifying Consumers</h2>
                     <p>Iterating over the consumers calling each one.</p>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
 func (p *Producer) Call() {
     data := Data{...}
     // do stuff
+
+    // when iterating over a slice the first element
+    // is the index into the slice, and the second
+    // is the value in the slice, we don't care about
+    // the index here so we assign it to the "special"
+    // variable _.
     for _, consumer := range p.consumers {
         consumer.Notify(data)
     }
@@ -256,25 +291,25 @@ func (p *Producer) Call() {
 
                 <section>
                     <h2>The Hub stores the consumers</h2>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
 type Hub struct {
-    // consumers is now a slice
+    // the hub stores the consumers
     consumers []Consumer
 }
 
-func (p *Hub) AddConsumer(consumer Consumer) {
-    p.consumers = append(p.consumers, consumer)
+func (h *Hub) AddConsumer(consumer Consumer) {
+    h.consumers = append(h.consumers, consumer)
 }
                     </code></pre>
                 </section>
 
                 <section>
                     <h2>Notifying Consumers</h2>
-                    <pre><code class="go">
-func (p *Hub) Notify(data Data) {
-    data := Data{...}
-    // do stuff
-    for _, consumer := range p.consumers {
+                    <pre><code class="go" data-trim>
+// Calling Notify on the hub just calls Notify
+// on all the consumers.
+func (h *Hub) Notify(data Data) {
+    for _, consumer := range h.consumers {
         consumer.Notify(data)
     }
 }
@@ -284,7 +319,9 @@ func (p *Hub) Notify(data Data) {
 
                 <section>
                     <h2>The Producer becomes smiple again</h2>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
+// We could use the concrete type Hub, but Hub
+// implements the Consumer interface.
 type Producer struct {
     consumer Consumer
 }
@@ -306,10 +343,10 @@ func (p *Producer) Call() {
             <section>
                 <h2>Quick Glossary</h2>
                 <ul>
-                    <li class="fragment">Publisher - the entity that generates the event</li>
-                    <li class="fragment">Publishing - the act notifying the subscribers</li>
-                    <li class="fragment">Subscriber - an entity wanting to be notified of an event</li>
-                    <li class="fragment">Callback - a function passed by the subscriber to be called for the event</li>
+                    <li class="fragment">Publisher &mdash; the entity that generates the event</li>
+                    <li class="fragment">Publishing &mdash; the act notifying the subscribers</li>
+                    <li class="fragment">Subscriber &mdash; an entity wanting to be notified of an event</li>
+                    <li class="fragment">Callback &mdash; a function passed by the subscriber to be called for the event</li>
                 </ul>
             </section>
 
@@ -327,7 +364,7 @@ func (p *Producer) Call() {
                 <section>
                     <h2>Multiple event types</h2>
                     <p>Use a name for an event, let's call them <em>topics</em>.</p>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
 type Topic string
 
 func (h *Hub) Publish(topic Topic, ...) {
@@ -343,11 +380,14 @@ func (h *Hub) Subscribe(topic Topic, ...) {
                 <section>
                     <h2>Arbitrary message data</h2>
                     <p>The <code>interface{}</code> type can be anything.</p>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
+// Publish a topic with some data.
 func (h *Hub) Publish(topic Topic, data interface{}) {
     // implementation
 }
 
+// Subscribe to a topic, and provide the callback that
+// gets told the topic and the data.
 func (h *Hub) Subscribe(topic Topic, func (Topic, interface{})) {
     // implementation
 }
@@ -370,6 +410,8 @@ type Hub struct {
 
 func (h *Hub) Subscribe(topic Topic, callback func (Topic, interface{})) {
     h.mutex.Lock()
+    // The "defer" keyword queues up the function to be called at the
+    // end of the function. Multiple defer calls work LIFO.
     defer h.mutex.Unlock()
     h.subscribers = append(h.subscribers, &amp;subscriber{topic, callback})
 }
@@ -384,6 +426,8 @@ func (h *Hub) Publish(topic Topic, data interface{}) {
     defer h.mutex.Unlock()
     for _, subscriber := range h.subscribers {
         if subscriber.topic == topic {
+            // The "go" key word calls the function in
+            // a different goroutine.
             go subscriber.callback(topic, data)
         }
     }
@@ -416,7 +460,7 @@ func (h *Hub) Publish(topic Topic, data interface{}) {
                 <section>
                     <h2>Unsubscribing</h2>
                     <p>Have the <code>Subscribe</code> function return something that can be used to unsubscribe.</p>
-                    <pre><code class="go">
+                    <pre><code class="go" data-trim>
 type Unsubscriber interface {
     Unsubscribe()
 }
@@ -431,7 +475,7 @@ func (h *Hub) Subscribe(...) Unsubscriber {
                 <section>
                     <h2>Identifying the subscription</h2>
                     <p>Each subscription has a unique identifier.</p>
-                    <pre><code class="go" data-noescape>
+                    <pre><code class="go" data-trim data-noescape>
 type subscriber struct {
     <mark>id       int</mark>
     topic    Topic
@@ -488,9 +532,11 @@ func (h *Hub) Subscribe(topic Topic,
                  callback func (Topic, interface{})) Unsubscriber {
     h.mutex.Lock()
     defer h.mutex.Unlock()
+
     h.index++
     h.subscribers = append(h.subscribers, &amp;subscriber{
         id: h.index, topic: topic, callback: callback})
+
     return &amp;handle{hub: h, id: h.index}
 }                    
                     </code></pre>
@@ -868,16 +914,42 @@ func (*jsonMarshaller) Unmarshal(data []byte, v interface{}) error {
                 </section>
 
                 <section>
+                    <h2>Marshalling Structures</h2>
+                    <pre><code class="go" data-trim  data-noescape>
+type Emitter struct {
+    Origin  string `json:"origin"`
+    Message string `json:"message"`
+    ID      int    `json:"id"`
+}
+
+value := Emitter{"master", "hello world", 42}
+// JSON Marshalling
+`{"origin":"master","message":"hello world","id":42}`
+
+// Unmarshalled into map[string]interface{} gives
+map[string]interface{}{
+    "origin": "master",
+    "message": "hello world",
+    "id": 42,
+}
+                    </code></pre>
+
+                </section>
+
+                <section>
                     <h2>Converting data</h2>
                     <pre><code class="go" data-trim  data-noescape>
 
 func (h *StructuredHub) toStringMap(data interface{})
         (map[string]interface{}, error) {
     var result map[string]interface{}
+
     // use the reflect package to get the type of the map
     resultType := reflect.TypeOf(result)
+
     // get the type of the data value
     dataType := reflect.TypeOf(data)
+
     // if you can assign the data value to the result map
     // it is a map[string]interface{}
     if dataType.AssignableTo(resultType) {
@@ -889,6 +961,7 @@ func (h *StructuredHub) toStringMap(data interface{})
         }
         return cast, nil
     }
+
     // convert to a map by marshalling the structure
     // out and back into a map
     bytes, err := h.marshaller.Marshal(data)
