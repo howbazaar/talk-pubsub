@@ -551,9 +551,10 @@ func (h *Hub) Subscribe(topic Topic,
                     <pre><code class="go" data-trim>
 func (*Suite) TestPublishOneSubscriber(c *gc.C) {
     var called bool
+    var topic pubsub.Topic = "test topic"
     hub := pubsub.NewHub()
-    hub.Subscribe(topic, func(topic pubsub.Topic, data interface{}) {
-        c.Check(topic, gc.Equals, topic)
+    hub.Subscribe(topic, func(call pubsub.Topic, data interface{}) {
+        c.Check(call, gc.Equals, topic)
         c.Check(data, gc.IsNil)
         called = true
     })
@@ -942,26 +943,12 @@ map[string]interface{}{
 
 func (h *StructuredHub) toStringMap(data interface{})
         (map[string]interface{}, error) {
-    var result map[string]interface{}
 
-    // use the reflect package to get the type of the map
-    resultType := reflect.TypeOf(result)
-
-    // get the type of the data value
-    dataType := reflect.TypeOf(data)
-
-    // if you can assign the data value to the result map
-    // it is a map[string]interface{}
-    if dataType.AssignableTo(resultType) {
-        cast, ok := data.(map[string]interface{})
-        if !ok {
-            return nil, errors.Errorf(
-                "%T assignable to map[string]interface{}"+
-                " but isn't one?", data)
-        }
+    if cast, ok := data.(map[string]interface{}); ok {
         return cast, nil
     }
 
+    var result map[string]interface{}
     // convert to a map by marshalling the structure
     // out and back into a map
     bytes, err := h.marshaller.Marshal(data)
